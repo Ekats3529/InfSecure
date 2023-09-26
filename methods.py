@@ -25,32 +25,31 @@ def put_message(message_path, container_path, stego_path):
         sys.stdout.write(result)
     else:
         with open(stego_path, "w") as file_stego:
-            file_stego.write(result + "\n")
+            file_stego.write(result)
 
 
 def get_message(message_path, stego_path):
     if message_path is None:
-        msg = sys.stdin.buffer.read()
+        text = [line[:-1:] for line in sys.stdin.readlines()]
     else:
         with open(stego_path, "r") as file_stego:
             text = [line[:-1:] for line in file_stego.readlines()]
 
     bin_text = ""
 
-    print(text)
+    #print(text)
     for i in range(len(text)):
         bin_text += "1" if text[i].endswith(" ") else "0"
 
-    result = ""
+    result = []
 
     for k in range((len(text) + 1) // 8):
-        cur_byte = bin_text[8 * k: (8 * (k + 1)):]
-        result += f"{str(hex(int(cur_byte, 2)))[1::]}"
+        result.append(int(bin_text[8 * k: (8 * (k + 1)):], 2))
 
-    print(result)
-    print(bytes(result, "UTF-8"))
+    result = bytes(result)
+
     if stego_path is None:
-        sys.stdout.write(result)
+        sys.stdout.buffer.write(result)
     else:
         with open(message_path, "wb") as file_msg:
-            file_msg.write(result)
+            file_msg.write(bytes(result))
